@@ -26,7 +26,8 @@ def process_prototypes(proto_file):
     
     for line in prototype_file:
         line = re.sub('\s*', '', line)
-        proto = line.split(',')
+        # Create the string array, then convert to float
+        proto = [float(datum) for datum in line.split(',')]
         prototypes.append(proto)
 
     return prototypes
@@ -38,7 +39,8 @@ def find_nearest_neighbor(prototypes, unknown_file):
     unknowns = open(unknown_file, 'r')
     for line in unknowns:
         line = re.sub('\s*', '', line)
-        unknown = line.split(',')
+        # Convert string array to float array
+        unknown = [float(datum) for datum in line.split(',')]
         category = categorize(unknown, prototypes)
         print(category)
 
@@ -65,7 +67,7 @@ def compute_dist(prototype, unknown):
     # array because the prototype array is one longer because
     # it also holds the category
     for i in range(len(unknown)):
-        sumOfSquares += (float(prototype[i]) - float(unknown[i]))**2
+        sumOfSquares += (prototype[i] - unknown[i])**2
     return math.sqrt(sumOfSquares)
 
 if __name__ == "__main__":
