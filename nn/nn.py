@@ -9,6 +9,12 @@ import sys
 import re
 import math
 
+class DataError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return msg
+
 # Input: The file containing the prototype descriptions
 # Output: A 2D array of the prototypes - each prototype
 # is represented as an array of its data with the element
@@ -52,6 +58,8 @@ def categorize(unknown, prototypes):
 # Compute Euclidean distance between prototype and unknown
 # sqrt((p1-u1)^2 + (p2-u2)^2 + ... + (pn-un)^2)
 def compute_dist(prototype, unknown):
+    if len(prototype) != len(unknown) + 1:
+        raise DataError('The number of data points in the prototype did not match the number of data points in the unknown')
     sumOfSquares = 0
     # Note: we must loop through the length of the unknown
     # array because the prototype array is one longer because
