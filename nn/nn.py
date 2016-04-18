@@ -44,7 +44,7 @@ def find_nearest_neighbor(prototypes, unknown_file):
         category = categorize(unknown, prototypes)
         print(category)
 
-# Input: An unknown (as a string list), the list of prototypes
+# Input: An unknown (as a float list), the list of prototypes
 # Output: The category of the prototype to which the unknown
 # is closest
 def categorize(unknown, prototypes):
