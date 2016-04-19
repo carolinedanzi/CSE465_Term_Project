@@ -19,6 +19,8 @@ zpm::~zpm()
 	
 }
 
+// Help from:
+// http://stackoverflow.com/questions/7868936/read-file-line-by-line
 void zpm::parseFile(char* fileName)
 {
 	// Open file for reading
@@ -27,9 +29,10 @@ void zpm::parseFile(char* fileName)
 	
 	// Loop through the lines in the file and parse each statement
 	std::string line = "";
-	while(!sourceFile.eof())
+	while(getline(sourceFile, line))
 	{
-		getline(sourceFile, line);
+		lineNum++;
+		std::cout << lineNum << " " ;
 		parseStmt(&line);
 	}
 }
@@ -39,6 +42,7 @@ void zpm::analyzeAssignment(std::string* line)
 	std::cout << "Assignment: " << *line << std::endl;
 }
 
+// Print the value of a variable, prefixed with the name of the variable and "="
 void zpm::analyzePrint(std::string* line)
 {
 	std::cout << "Print: " << *line << std::endl;
@@ -46,7 +50,17 @@ void zpm::analyzePrint(std::string* line)
 	int firstSpace = line->find_first_of(" ");
 	int lastSpace = line->find_last_of(" ");
 	
-	std::cout << line->substr(firstSpace, (lastSpace - firstSpace)) << std::endl;
+	// Strip off leading and trailing whitespace
+	std::string varName = line->substr(firstSpace, (lastSpace - firstSpace));
+	
+	// Get value of this variable from var table, and throw error if it has not
+	// been assigned a value
+	//if(varTable.find(varName) == varTable.end())
+	//{
+		//raiseError();
+	//}
+	
+	std::cout << varName << "=" << std::endl;
 }
 
 // Determines which function to send the line to for interpretation
@@ -61,11 +75,16 @@ void zpm::parseStmt(std::string* line)
 	}
 }
 
+void zpm::raiseError()
+{
+	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
 	if(argc < 2)
 	{
-		std::cerr << "Expected a command line arguments" << std::endl;
+		std::cerr << "Expected one command line argument" << std::endl;
 	}
 	
 	// The first command line argument is the name of the file,

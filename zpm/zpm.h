@@ -10,7 +10,7 @@
 class zpm
 {
 	private:
-		std::map<std::string, std::string> variables;
+		std::map<std::string, std::string> varTable;
 		int lineNum;
 	
 	public:
