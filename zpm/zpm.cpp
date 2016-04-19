@@ -38,6 +38,9 @@ void zpm::parseFile(char* fileName)
 	}
 }
 
+// <assignment> 	-> <var_name> <assign_op> <value> ;
+// <assign_op>	-> = | += | *= | -=
+// <value>			-> string | int
 // Convert string to char* help from:
 // http://stackoverflow.com/questions/7352099/stdstring-to-char
 // http://www.cplusplus.com/reference/string/string/c_str/
@@ -46,16 +49,52 @@ void zpm::analyzeAssignment(std::string* line)
 	std::cout << "Assignment: " << *line << std::endl;
 	
 	// Get the variable name
+	std::string varName = nextToken(line);
+	std::cout << "First token: " << varName << std::endl;
+	
+	// Get the assignment operator (the second token)	
+	std::string assignOp = nextToken(line);
+	std::cout << "Second token: " << assignOp << std::endl;
 	
 	// Get the value of the variable
-	
-	// Assign based on the type of assignment
-	// Throw appropriate error if variable value is used before declaration
-	// or if the assignment operator is not appropriate for the type
+	std::string varValue = nextToken(line);
+	// Determine the type of the data value - either a string, int, or variable
+	Type varType = determineType(varValue);
 	char* str = new char[line->length() + 1];
 	std::strcpy(str, line->c_str());
 	std::cout << "Copy of line: " << str << std::endl;
 	delete str;
+	std::cout << "Third token: " << varValue << std::endl;
+	
+	// Assign based on the type of assignment
+	// Throw appropriate error if variable value is used before declaration
+	// or if the assignment operator is not appropriate for the type
+	
+}
+
+// Help on isdigit from 
+// http://www.cplusplus.com/reference/cctype/isdigit/
+Type zpm::determineType(std::string token)
+{
+	if(token[0] == '\"') { return typeString; }
+	else if(isdigit(token[0])) { return typeInt; }
+	else { return typeVar; }
+}
+
+// Gets the first token in the string
+// Find a way to modify line so it removes the first token
+std::string zpm::nextToken(std::string* line)
+{
+	// Find the first space, which delineates the first token
+	int delimiterIndex = line->find_first_of(" ");
+	std::string token = line->substr(0, delimiterIndex);
+	token = trim(&token);
+	
+	// Change line to remove the first token
+	*line = line->substr(delimiterIndex, (line->length() - delimiterIndex));
+	*line = trim(line);
+	
+	return token;
 }
 
 // Print the value of a variable, prefixed with the name of the variable and "="

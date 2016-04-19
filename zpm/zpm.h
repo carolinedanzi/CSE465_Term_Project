@@ -7,13 +7,16 @@
 #include <iostream>
 #include <stdlib.h>
 
+// In this language, something can be a string, int, or variable
+enum Type {typeString, typeInt, typeVar};
+
 // Discriminated union to store the data value of the variable
 // There is a flag to tell whether the type is a string or int
 // Help on discriminated unions from:
 // http://www.drdobbs.com/cpp/discriminated-unions-i/184403821?pgno=2
 struct Data
 {
-	enum typeFlag {typeString, typeInt};
+	Type typeFlag;
 	union dataValue
 	{
 		char* s;
@@ -28,6 +31,12 @@ class zpm
 		int lineNum;
 		
 		std::string trim(std::string* str);
+		
+		// Gets the first token in the string
+		// Find a way to modify line so it removes the first token
+		std::string nextToken(std::string* str);
+		
+		Type determineType(std::string token);
 		
 		void raiseError();
 	
