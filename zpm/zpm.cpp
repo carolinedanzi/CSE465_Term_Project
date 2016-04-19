@@ -45,22 +45,24 @@ void zpm::analyzeAssignment(std::string* line)
 // Print the value of a variable, prefixed with the name of the variable and "="
 void zpm::analyzePrint(std::string* line)
 {
-	std::cout << "Print: " << *line << std::endl;
 	// Find the middle segment, which is what we need to print
 	int firstSpace = line->find_first_of(" ");
 	int lastSpace = line->find_last_of(" ");
 	
 	// Strip off leading and trailing whitespace
 	std::string varName = line->substr(firstSpace, (lastSpace - firstSpace));
+	varName = trim(&varName);
 	
 	// Get value of this variable from var table, and throw error if it has not
 	// been assigned a value
-	//if(varTable.find(varName) == varTable.end())
-	//{
-		//raiseError();
-	//}
-	
-	std::cout << varName << "=" << std::endl;
+	if(varTable.find(varName) == varTable.end())
+	{
+		raiseError();
+	} else {
+		// Print out variable value with prefixed
+		std::string value = varTable[varName];
+		std::cout << varName << "=" << std::endl;
+	}
 }
 
 // Determines which function to send the line to for interpretation
@@ -78,6 +80,15 @@ void zpm::parseStmt(std::string* line)
 void zpm::raiseError()
 {
 	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;
+}
+
+// Trims leading and trailing whitespace from a string - Help from:
+// http://stackoverflow.com/questions/25829143/c-trim-whitespace-from-a-string
+std::string zpm::trim(std::string* str)
+{
+	int begin = str->find_first_not_of(" ");
+	int end = str->find_last_not_of(" ");
+	return str->substr(begin, (end-begin+1));
 }
 
 int main(int argc, char* argv[])

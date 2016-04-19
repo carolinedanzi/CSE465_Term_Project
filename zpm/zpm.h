@@ -12,6 +12,10 @@ class zpm
 	private:
 		std::map<std::string, std::string> varTable;
 		int lineNum;
+		
+		std::string trim(std::string* str);
+		
+		void raiseError();
 	
 	public:
 		// Constructor
@@ -31,5 +35,4 @@ class zpm
 		
 		void analyzePrint(std::string* line);
 		
-		void raiseError();
 };
