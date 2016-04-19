@@ -24,12 +24,12 @@ class zpm
 		
 		// Takes in a line of the source code, parses it,
 		// and sends it to the proper function
-		void parseStmt(std::string line);
+		void parseStmt(std::string* line);
 		
 		// 
-		void analyzeAssignment(std::string line);
+		void analyzeAssignment(std::string* line);
 		
-		void analyzePrint(std::string line);
+		void analyzePrint(std::string* line);
 		
 		void raiseError();
 };

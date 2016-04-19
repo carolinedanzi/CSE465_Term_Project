@@ -30,13 +30,35 @@ void zpm::parseFile(char* fileName)
 	while(!sourceFile.eof())
 	{
 		getline(sourceFile, line);
-		parseStmt(line);
+		parseStmt(&line);
 	}
 }
 
-void zpm::parseStmt(std::string line)
+void zpm::analyzeAssignment(std::string* line)
 {
-	std::cout << line << std::endl;
+	std::cout << "Assignment: " << *line << std::endl;
+}
+
+void zpm::analyzePrint(std::string* line)
+{
+	std::cout << "Print: " << *line << std::endl;
+	// Find the middle segment, which is what we need to print
+	int firstSpace = line->find_first_of(" ");
+	int lastSpace = line->find_last_of(" ");
+	
+	std::cout << line->substr(firstSpace, (lastSpace - firstSpace)) << std::endl;
+}
+
+// Determines which function to send the line to for interpretation
+void zpm::parseStmt(std::string* line)
+{
+	// If print is not in the string, it must be an assignment statement
+	if(line->find("PRINT") == -1)
+	{
+		analyzeAssignment(line);
+	} else {
+		analyzePrint(line);
+	}
 }
 
 int main(int argc, char* argv[])
