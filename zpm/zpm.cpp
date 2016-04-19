@@ -8,6 +8,7 @@
 
 #include "zpm.h"
 #include <fstream>
+#include <cstring>
 
 zpm::zpm()
 {
@@ -37,9 +38,24 @@ void zpm::parseFile(char* fileName)
 	}
 }
 
+// Convert string to char* help from:
+// http://stackoverflow.com/questions/7352099/stdstring-to-char
+// http://www.cplusplus.com/reference/string/string/c_str/
 void zpm::analyzeAssignment(std::string* line)
 {
 	std::cout << "Assignment: " << *line << std::endl;
+	
+	// Get the variable name
+	
+	// Get the value of the variable
+	
+	// Assign based on the type of assignment
+	// Throw appropriate error if variable value is used before declaration
+	// or if the assignment operator is not appropriate for the type
+	char* str = new char[line->length() + 1];
+	std::strcpy(str, line->c_str());
+	std::cout << "Copy of line: " << str << std::endl;
+	delete str;
 }
 
 // Print the value of a variable, prefixed with the name of the variable and "="
@@ -60,7 +76,7 @@ void zpm::analyzePrint(std::string* line)
 		raiseError();
 	} else {
 		// Print out variable value with prefixed
-		std::string value = varTable[varName];
+		Data value = varTable[varName];
 		std::cout << varName << "=" << std::endl;
 	}
 }

@@ -7,10 +7,24 @@
 #include <iostream>
 #include <stdlib.h>
 
+// Discriminated union to store the data value of the variable
+// There is a flag to tell whether the type is a string or int
+// Help on discriminated unions from:
+// http://www.drdobbs.com/cpp/discriminated-unions-i/184403821?pgno=2
+struct Data
+{
+	enum typeFlag {typeString, typeInt};
+	union dataValue
+	{
+		char* s;
+		int i;
+	};
+};
+
 class zpm
 {
 	private:
-		std::map<std::string, std::string> varTable;
+		std::map<std::string, Data> varTable;
 		int lineNum;
 		
 		std::string trim(std::string* str);
