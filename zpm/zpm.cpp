@@ -56,15 +56,43 @@ void zpm::analyzeAssignment(std::string* line)
 	std::string assignOp = nextToken(line);
 	std::cout << "Second token: " << assignOp << std::endl;
 	
-	// Get the value of the variable
-	std::string varValue = nextToken(line);
-	// Determine the type of the data value - either a string, int, or variable
-	Type varType = determineType(varValue);
+	// Get the value of the right hand side (RHS) of the assignment statement
+	std::string stringVal = nextToken(line);
+	Data value;
+	
+	// Determine the type of the RHS - either a string, int, or variable
+	Type varType = determineType(stringVal);
+	// If the type of the RHS is a variable, we need to get its value
+	if(varType == typeVar)
+	{
+		if(varTable.find(stringVal) == varTable.end())
+		{
+			raiseError();
+		} else {
+			value = varTable[stringVal];
+		}
+	} 
+	// If the type is a string, set the type flag and string value of the union
+	else if(varType == typeString) {
+		value.typeFlag = typeString;
+		// Data discriminated union stores char*, not std::string
+		stringVal = stripQuotes(stringVal);
+		char* str = new char[stringVal.length() + 1];
+		std::strcpy(str, stringVal.c_str());
+		value.s = str;
+		delete str;
+	} 
+	// Otherwise, this is an integer
+	else{
+		value.typeFlag = typeInt;
+		value.i = std::stoi(stringVal);
+	}
+	
 	char* str = new char[line->length() + 1];
 	std::strcpy(str, line->c_str());
 	std::cout << "Copy of line: " << str << std::endl;
 	delete str;
-	std::cout << "Third token: " << varValue << std::endl;
+	std::cout << "Third token: " << stringVal << std::endl;
 	
 	// Assign based on the type of assignment
 	// Throw appropriate error if variable value is used before declaration
@@ -79,6 +107,14 @@ Type zpm::determineType(std::string token)
 	if(token[0] == '\"') { return typeString; }
 	else if(isdigit(token[0])) { return typeInt; }
 	else { return typeVar; }
+}
+
+// Strips the quotes off a token - ex: "hello" -> hello
+// Input: The string token
+// Output: The string token with first and last chars removed
+std::string zpm::stripQuotes(std::string token)
+{
+	return token.substr(1, token.length() - 2);
 }
 
 // Gets the first token in the string

@@ -17,7 +17,7 @@ enum Type {typeString, typeInt, typeVar};
 struct Data
 {
 	Type typeFlag;
-	union dataValue
+	union 
 	{
 		char* s;
 		int i;
@@ -37,6 +37,8 @@ class zpm
 		std::string nextToken(std::string* str);
 		
 		Type determineType(std::string token);
+		
+		std::string stripQuotes(std::string token);
 		
 		void raiseError();
 	
