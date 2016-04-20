@@ -33,7 +33,6 @@ void zpm::parseFile(char* fileName)
 	while(getline(sourceFile, line))
 	{
 		lineNum++;
-		std::cout << lineNum << " " ;
 		parseStmt(&line);
 	}
 }
@@ -50,11 +49,9 @@ void zpm::analyzeAssignment(std::string* line)
 	
 	// Get the variable name
 	std::string varName = nextToken(line);
-	std::cout << "First token: " << varName << std::endl;
 	
 	// Get the assignment operator (the second token)	
 	std::string assignOp = nextToken(line);
-	std::cout << "Second token: " << assignOp << std::endl;
 	
 	// Get the value of the right hand side (RHS) of the assignment statement
 	std::string stringVal = nextToken(line);
@@ -62,44 +59,56 @@ void zpm::analyzeAssignment(std::string* line)
 	
 	// Determine the type of the RHS - either a string, int, or variable
 	Type varType = determineType(stringVal);
-	// If the type of the RHS is a variable, we need to get its value
-	if(varType == typeVar)
-	{
-		if(varTable.find(stringVal) == varTable.end())
-		{
-			raiseError();
-		} else {
-			value = varTable[stringVal];
-		}
-	} 
-	// If the type is a string, set the type flag and string value of the union
-	else if(varType == typeString) {
-		value.typeFlag = typeString;
-		// Data discriminated union stores char*, not std::string
-		stringVal = stripQuotes(stringVal);
-		char* str = new char[stringVal.length() + 1];
-		std::strcpy(str, stringVal.c_str());
-		value.s = str;
-		delete str;
-	} 
-	// Otherwise, this is an integer
-	else{
-		value.typeFlag = typeInt;
-		value.i = std::stoi(stringVal);
-	}
 	
-	char* str = new char[line->length() + 1];
-	std::strcpy(str, line->c_str());
-	std::cout << "Copy of line: " << str << std::endl;
-	delete str;
-	std::cout << "Third token: " << stringVal << std::endl;
+	switch(varType)
+	{
+		// If the type of the RHS is a variable, we need to get its value
+		// If it does not have a value, it has not been declared so throw an error
+		case typeVar:
+		{
+			if(varTable.find(stringVal) == varTable.end())
+			{
+				raiseError();
+			} else {
+				value = varTable[stringVal];
+			}
+			break;
+		}
+		// If value is a string, strip the quotes and convert it to a char array
+		case typeString:
+		{
+			value.typeFlag = typeString;
+			// Data discriminated union stores char*, not std::string
+			stringVal = stripQuotes(stringVal);
+			char* str = new char[stringVal.length() + 1];
+			std::strcpy(str, stringVal.c_str());
+			value.s = str;
+			delete str;
+			break;
+		}
+		// If the type is an int, just update the discriminated union
+		case typeInt:
+		{
+			value.typeFlag = typeInt;
+			value.i = std::stoi(stringVal);
+			break;
+		}
+		default:
+			raiseError();
+	}
 	
 	// Assign based on the type of assignment
 	// Throw appropriate error if variable value is used before declaration
 	// or if the assignment operator is not appropriate for the type
+	if(assignOp == "=")
+	{
+		varTable[varName] = value;
+	}
 	
 }
 
+// Interprets the type (either variable, string, or int)
+// of a string token from the source code
 // Help on isdigit from 
 // http://www.cplusplus.com/reference/cctype/isdigit/
 Type zpm::determineType(std::string token)
@@ -117,8 +126,8 @@ std::string zpm::stripQuotes(std::string token)
 	return token.substr(1, token.length() - 2);
 }
 
-// Gets the first token in the string
-// Find a way to modify line so it removes the first token
+// Gets the first token in the string and removes it
+// from the line
 std::string zpm::nextToken(std::string* line)
 {
 	// Find the first space, which delineates the first token
@@ -152,7 +161,20 @@ void zpm::analyzePrint(std::string* line)
 	} else {
 		// Print out variable value with prefixed
 		Data value = varTable[varName];
-		std::cout << varName << "=" << std::endl;
+		switch(value.typeFlag)
+		{
+			case typeString:
+				std::cout << varName << "=" << value.s << std::endl;
+				break;
+			
+			case typeInt:
+				std::cout << varName << "=" << value.i << std::endl;
+				break;
+			
+			default:
+				std::cout << "Something went wrong in print" << std::endl;
+		}
+		
 	}
 }
 
@@ -168,6 +190,8 @@ void zpm::parseStmt(std::string* line)
 	}
 }
 
+// Prints out an error message with the line number that 
+// contains the error
 void zpm::raiseError()
 {
 	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;
@@ -195,6 +219,8 @@ int main(int argc, char* argv[])
 	
 	zpm* interpreter = new zpm();
 	interpreter->parseFile(sourceFileName);
+	
+	delete interpreter;
 	
 	return 0;
 }

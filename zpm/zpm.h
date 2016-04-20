@@ -14,10 +14,11 @@ enum Type {typeString, typeInt, typeVar};
 // There is a flag to tell whether the type is a string or int
 // Help on discriminated unions from:
 // http://www.drdobbs.com/cpp/discriminated-unions-i/184403821?pgno=2
+// http://stackoverflow.com/questions/4788965/when-would-anyone-use-a-union-is-it-a-remnant-from-the-c-only-days
 struct Data
 {
 	Type typeFlag;
-	union 
+	union
 	{
 		char* s;
 		int i;
