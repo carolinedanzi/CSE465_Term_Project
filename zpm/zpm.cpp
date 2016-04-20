@@ -97,12 +97,35 @@ void zpm::analyzeAssignment(std::string* line)
 			raiseError();
 	}
 	
+	// Check that for (+*-)= the types are compatible
+	if(assignOp != "=")
+	{
+		if(varTable[varName].typeFlag != value.typeFlag)
+		{
+			raiseError();
+		}
+	}
+	
 	// Assign based on the type of assignment
-	// Throw appropriate error if variable value is used before declaration
 	// or if the assignment operator is not appropriate for the type
 	if(assignOp == "=")
 	{
 		varTable[varName] = value;
+	} 
+	else if(assignOp == "+=")
+	{
+		if(value.typeFlag == typeInt)
+		{
+			varTable[varName].i = varTable[varName].i + value.i;
+		}
+	}
+	else if(assignOp == "*=")
+	{
+		varTable[varName].i = varTable[varName].i * value.i;
+	}
+	else // -=
+	{
+		varTable[varName].i = varTable[varName].i - value.i;
 	}
 	
 }
