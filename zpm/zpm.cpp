@@ -10,15 +10,25 @@
 #include <fstream>
 #include <cstring>
 
+///////////////////////////////////////////////////////////////////////////////////////////
+// =============== Constructor and Destructor ==================
+///////////////////////////////////////////////////////////////////////////////////////////
 zpm::zpm()
 {
 	
 }
 
+// Delete all the char* pointers from the varTable (point to strings)
+// Help on iterating through a map from:
+// http://stackoverflow.com/questions/4844886/how-to-loop-through-a-c-map
 zpm::~zpm()
 {
-	
+	deletePointers();
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// ================ Basic File Parsing =======================//
+///////////////////////////////////////////////////////////////////////////////////////////
 
 // Help from:
 // http://stackoverflow.com/questions/7868936/read-file-line-by-line
@@ -37,6 +47,22 @@ void zpm::parseFile(char* fileName)
 	}
 }
 
+// Determines which function to send the line to for interpretation
+void zpm::parseStmt(std::string* line)
+{
+	// If print is not in the string, it must be an assignment statement
+	if(line->find("PRINT") == -1)
+	{
+		analyzeAssignment(line);
+	} else {
+		analyzePrint(line);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// ================= Analyze Assignment and Print ==============//
+///////////////////////////////////////////////////////////////////////////////////////////
+
 // <assignment> 	-> <var_name> <assign_op> <value> ;
 // <assign_op>	-> = | += | *= | -=
 // <value>			-> string | int
@@ -44,9 +70,7 @@ void zpm::parseFile(char* fileName)
 // http://stackoverflow.com/questions/7352099/stdstring-to-char
 // http://www.cplusplus.com/reference/string/string/c_str/
 void zpm::analyzeAssignment(std::string* line)
-{
-	std::cout << "Assignment: " << *line << std::endl;
-	
+{	
 	// Get the variable name
 	std::string varName = nextToken(line);
 	
@@ -155,41 +179,6 @@ void zpm::analyzeAssignment(std::string* line)
 	
 }
 
-// Interprets the type (either variable, string, or int)
-// of a string token from the source code
-// Help on isdigit from 
-// http://www.cplusplus.com/reference/cctype/isdigit/
-Type zpm::determineType(std::string token)
-{
-	if(token[0] == '\"') { return typeString; }
-	else if(isdigit(token[0])) { return typeInt; }
-	else { return typeVar; }
-}
-
-// Strips the quotes off a token - ex: "hello" -> hello
-// Input: The string token
-// Output: The string token with first and last chars removed
-std::string zpm::stripQuotes(std::string token)
-{
-	return token.substr(1, token.length() - 2);
-}
-
-// Gets the first token in the string and removes it
-// from the line
-std::string zpm::nextToken(std::string* line)
-{
-	// Find the first space, which delineates the first token
-	int delimiterIndex = line->find_first_of(" ");
-	std::string token = line->substr(0, delimiterIndex);
-	token = trim(&token);
-	
-	// Change line to remove the first token
-	*line = line->substr(delimiterIndex, (line->length() - delimiterIndex));
-	*line = trim(line);
-	
-	return token;
-}
-
 // Print the value of a variable, prefixed with the name of the variable and "="
 void zpm::analyzePrint(std::string* line)
 {
@@ -222,24 +211,43 @@ void zpm::analyzePrint(std::string* line)
 	}
 }
 
-// Determines which function to send the line to for interpretation
-void zpm::parseStmt(std::string* line)
+///////////////////////////////////////////////////////////////////////////////////////////
+// ================= Helper Methods =======================//
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// Interprets the type (either variable, string, or int)
+// of a string token from the source code
+// Help on isdigit from 
+// http://www.cplusplus.com/reference/cctype/isdigit/
+Type zpm::determineType(std::string token)
 {
-	// If print is not in the string, it must be an assignment statement
-	if(line->find("PRINT") == -1)
-	{
-		analyzeAssignment(line);
-	} else {
-		analyzePrint(line);
-	}
+	if(token[0] == '\"') { return typeString; }
+	else if(isdigit(token[0])) { return typeInt; }
+	else { return typeVar; }
 }
 
-// Prints out an error message with the line number that 
-// contains the error
-void zpm::raiseError()
+// Gets the first token in the string and removes it
+// from the line
+std::string zpm::nextToken(std::string* line)
 {
-	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;
-	exit(1);
+	// Find the first space, which delineates the first token
+	int delimiterIndex = line->find_first_of(" ");
+	std::string token = line->substr(0, delimiterIndex);
+	token = trim(&token);
+	
+	// Change line to remove the first token
+	*line = line->substr(delimiterIndex, (line->length() - delimiterIndex));
+	*line = trim(line);
+	
+	return token;
+}
+
+// Strips the quotes off a token - ex: "hello" -> hello
+// Input: The string token
+// Output: The string token with first and last chars removed
+std::string zpm::stripQuotes(std::string token)
+{
+	return token.substr(1, token.length() - 2);
 }
 
 // Trims leading and trailing whitespace from a string - Help from:
@@ -250,6 +258,33 @@ std::string zpm::trim(std::string* str)
 	int end = str->find_last_not_of(" ");
 	return str->substr(begin, (end-begin+1));
 }
+
+// Deletes the char* pointers in varTable - used in destructor and raiseError()
+void zpm::deletePointers()
+{
+	typedef std::map<std::string, Data>::iterator it_type;
+	for(it_type iterator = varTable.begin(); iterator != varTable.end(); iterator++) {
+		if(iterator->second.typeFlag == typeString)
+		{
+			delete iterator->second.s;
+		}
+	}
+}
+
+// Prints out an error message with the line number that 
+// contains the error
+// QUESTION: do we need to delete the char* pointers?
+void zpm::raiseError()
+{
+	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;
+	// Delete the char* pointers
+	deletePointers();
+	exit(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//====================== Main =========================//
+///////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[])
 {

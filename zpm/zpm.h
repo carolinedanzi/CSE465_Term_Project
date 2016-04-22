@@ -28,20 +28,28 @@ struct Data
 class zpm
 {
 	private:
+		// Keep track of variables and line numbers
 		std::map<std::string, Data> varTable;
 		int lineNum;
 		
+		// Trim leading and trailing whitespace
 		std::string trim(std::string* str);
 		
-		// Gets the first token in the string
-		// Find a way to modify line so it removes the first token
+		// Gives the next token in a line and removes it from string
 		std::string nextToken(std::string* str);
 		
+		// Determines the enum Type of a particular token
 		Type determineType(std::string token);
 		
+		// Strips the quotations marks from around a token
 		std::string stripQuotes(std::string token);
 		
+		// Prints a runtime error message, deletes char* in var table,
+		// and exits program
 		void raiseError();
+		
+		// Deletes the char* pointers in varTable
+		void deletePointers();
 	
 	public:
 		// Constructor
@@ -50,15 +58,16 @@ class zpm
 		// Destructor
 		~zpm();
 		
+		// Gets each line of the file and parses it
 		void parseFile(char* fileName);
 		
-		// Takes in a line of the source code, parses it,
-		// and sends it to the proper function
+		// Decides whether the statement is an assignment or print statement
 		void parseStmt(std::string* line);
 		
-		// 
+		// Interprets an assignment statement
 		void analyzeAssignment(std::string* line);
 		
+		// Interprets a print statement
 		void analyzePrint(std::string* line);
 		
 };
