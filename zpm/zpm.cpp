@@ -80,10 +80,8 @@ void zpm::analyzeAssignment(std::string* line)
 			value.typeFlag = typeString;
 			// Data discriminated union stores char*, not std::string
 			stringVal = stripQuotes(stringVal);
-			char* str = new char[stringVal.length() + 1];
-			std::strcpy(str, stringVal.c_str());
-			value.s = str;
-			delete str;
+			value.s = new char[stringVal.length() + 1];
+			std::strcpy(value.s, stringVal.c_str());
 			break;
 		}
 		// If the type is an int, just update the discriminated union
@@ -98,33 +96,60 @@ void zpm::analyzeAssignment(std::string* line)
 	}
 	
 	// Check that for (+*-)= the types are compatible
+	// and that only ints are used with (*-)=
 	if(assignOp != "=")
 	{
 		if(varTable[varName].typeFlag != value.typeFlag)
 		{
 			raiseError();
 		}
+		if((assignOp == "*=" || assignOp == "-=") && value.typeFlag != typeInt)
+		{
+			raiseError();
+		}
 	}
 	
 	// Assign based on the type of assignment
-	// or if the assignment operator is not appropriate for the type
 	if(assignOp == "=")
 	{
 		varTable[varName] = value;
 	} 
 	else if(assignOp == "+=")
 	{
+		// TODO: Handle string concatenation
 		if(value.typeFlag == typeInt)
 		{
+			varTable[varName].typeFlag = typeInt;
 			varTable[varName].i = varTable[varName].i + value.i;
+		} else {
+			varTable[varName].typeFlag = typeString;
+			// Create a new char array where the length is the length of both strings
+			// plus the null terminator character
+			int newLength = strlen(varTable[varName].s) + strlen(value.s) + 1;
+			char* dest = new char[newLength];
+			
+			// Put the original string for this variable in the char array
+			strcpy(dest, varTable[varName].s);
+			
+			// Concatenate the new string onto the old
+			strcat(dest, value.s);
+			
+			// Store this new string in the var table
+			strcpy(varTable[varName].s, dest);
+			delete dest;
+			// Destination needs to be a large enough array to hold both strings 
+			// char* can convert to const char* implicitly
+			// varTable[varName].s = 
 		}
 	}
 	else if(assignOp == "*=")
 	{
+		varTable[varName].typeFlag = typeInt;
 		varTable[varName].i = varTable[varName].i * value.i;
 	}
 	else // -=
 	{
+		varTable[varName].typeFlag = typeInt;
 		varTable[varName].i = varTable[varName].i - value.i;
 	}
 	
@@ -169,12 +194,8 @@ std::string zpm::nextToken(std::string* line)
 void zpm::analyzePrint(std::string* line)
 {
 	// Find the middle segment, which is what we need to print
-	int firstSpace = line->find_first_of(" ");
-	int lastSpace = line->find_last_of(" ");
-	
-	// Strip off leading and trailing whitespace
-	std::string varName = line->substr(firstSpace, (lastSpace - firstSpace));
-	varName = trim(&varName);
+	nextToken(line); // First token is PRINT
+	std::string varName = nextToken(line);
 	
 	// Get value of this variable from var table, and throw error if it has not
 	// been assigned a value
@@ -182,7 +203,7 @@ void zpm::analyzePrint(std::string* line)
 	{
 		raiseError();
 	} else {
-		// Print out variable value with prefixed
+		// Print out variable value with variable name prefixed
 		Data value = varTable[varName];
 		switch(value.typeFlag)
 		{
