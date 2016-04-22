@@ -239,6 +239,7 @@ void zpm::parseStmt(std::string* line)
 void zpm::raiseError()
 {
 	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;
+	exit(1);
 }
 
 // Trims leading and trailing whitespace from a string - Help from:
