@@ -43,15 +43,15 @@ void zpm::parseFile(char* fileName)
 	while(getline(sourceFile, line))
 	{
 		lineNum++;
-		parseStmt(&line);
+		parseStmt(line);
 	}
 }
 
 // Determines which function to send the line to for interpretation
-void zpm::parseStmt(std::string* line)
+void zpm::parseStmt(std::string line)
 {
 	// If print is not in the string, it must be an assignment statement
-	if(line->find("PRINT") == -1)
+	if(line.find("PRINT") == -1)
 	{
 		analyzeAssignment(line);
 	} else {
@@ -69,16 +69,16 @@ void zpm::parseStmt(std::string* line)
 // Convert string to char* help from:
 // http://stackoverflow.com/questions/7352099/stdstring-to-char
 // http://www.cplusplus.com/reference/string/string/c_str/
-void zpm::analyzeAssignment(std::string* line)
+void zpm::analyzeAssignment(std::string line)
 {	
 	// Get the variable name
-	std::string varName = nextToken(line);
+	std::string varName = nextToken(&line);
 	
 	// Get the assignment operator (the second token)	
-	std::string assignOp = nextToken(line);
+	std::string assignOp = nextToken(&line);
 	
 	// Get the value of the right hand side (RHS) of the assignment statement
-	std::string stringVal = nextToken(line);
+	std::string stringVal = nextToken(&line);
 	Data value;
 	
 	// Determine the type of the RHS - either a string, int, or variable
@@ -161,9 +161,6 @@ void zpm::analyzeAssignment(std::string* line)
 			// Store this new string in the var table
 			strcpy(varTable[varName].s, dest);
 			delete dest;
-			// Destination needs to be a large enough array to hold both strings 
-			// char* can convert to const char* implicitly
-			// varTable[varName].s = 
 		}
 	}
 	else if(assignOp == "*=")
@@ -180,11 +177,11 @@ void zpm::analyzeAssignment(std::string* line)
 }
 
 // Print the value of a variable, prefixed with the name of the variable and "="
-void zpm::analyzePrint(std::string* line)
+void zpm::analyzePrint(std::string line)
 {
 	// Find the middle segment, which is what we need to print
-	nextToken(line); // First token is PRINT
-	std::string varName = nextToken(line);
+	nextToken(&line); // First token is PRINT
+	std::string varName = nextToken(&line);
 	
 	// Get value of this variable from var table, and throw error if it has not
 	// been assigned a value
@@ -273,7 +270,6 @@ void zpm::deletePointers()
 
 // Prints out an error message with the line number that 
 // contains the error
-// QUESTION: do we need to delete the char* pointers?
 void zpm::raiseError()
 {
 	std::cerr << "RUNTIME ERROR: line " << lineNum << std::endl;

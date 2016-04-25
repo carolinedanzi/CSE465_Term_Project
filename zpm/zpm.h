@@ -62,12 +62,12 @@ class zpm
 		void parseFile(char* fileName);
 		
 		// Decides whether the statement is an assignment or print statement
-		void parseStmt(std::string* line);
+		void parseStmt(std::string line);
 		
 		// Interprets an assignment statement
-		void analyzeAssignment(std::string* line);
+		void analyzeAssignment(std::string line);
 		
 		// Interprets a print statement
-		void analyzePrint(std::string* line);
+		void analyzePrint(std::string line);
 		
 };
