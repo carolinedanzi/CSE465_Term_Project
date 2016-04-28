@@ -161,6 +161,7 @@ void zpm::analyzeAssignment(std::string line)
 			// Store this new string in the var table
 			strcpy(varTable[varName].s, dest);
 			delete dest;
+			dest = NULL;
 		}
 	}
 	else if(assignOp == "*=")
@@ -264,6 +265,7 @@ void zpm::deletePointers()
 		if(iterator->second.typeFlag == typeString)
 		{
 			delete iterator->second.s;
+			iterator->second.s = NULL;
 		}
 	}
 }
@@ -297,6 +299,7 @@ int main(int argc, char* argv[])
 	interpreter->parseFile(sourceFileName);
 	
 	delete interpreter;
+	interpreter = NULL;
 	
 	return 0;
 }
