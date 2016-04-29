@@ -106,5 +106,4 @@
 (newline)
 (display (greatUncle parents 'male8 'female8)) ; #f
 (newline)
-
 ,exit

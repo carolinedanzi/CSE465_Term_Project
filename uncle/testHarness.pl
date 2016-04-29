@@ -1,9 +1,9 @@
-query(greatuncleaunt(b, c)).
-query(greatuncleaunt(a, c)).
-query(greatuncleaunt(b, b)).
-query(greatuncleaunt(b, a)).
-query(greatuncleaunt(c, e)).
-query(greatuncleaunt(d, e)).
+query(greatuncleaunt(male6, female7)).
+query(greatuncleaunt(male6, male8)).
+query(greatuncleaunt(female7, male3)).
+query(greatuncleaunt(female4, female7)).
+query(greatuncleaunt(female4, male3)).
+query(greatuncleaunt(male3, male7)).
 
 writeln(T) :- write(T), nl.
 
