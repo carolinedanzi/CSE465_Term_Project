@@ -15,7 +15,10 @@
 (female2 male6)(male4 female6)(male8 female8)(male7 female10)))
 
 (define (greatUncle lst uncle kid)
-	(if (member kid (getNextGeneration (getNextGeneration (getNextGeneration (getAuntUncleParents lst married uncle))))) #t #f)
+	(if (member kid (getNextGeneration parents 
+	(getNextGeneration parents 
+	(remove (getSpouse married uncle)
+	(remove uncle (getNextGeneration parents (getAuntUncleParents lst married uncle))))))) #t #f)
 )
 
 (define (getAuntUncleParents parents married uncle)
@@ -54,18 +57,24 @@
 	)
 )
 
-(define (getNextGeneration currentGen)
+(define (remove elmt lst)
+	(COND
+		((NULL? lst) '())
+		((EQUAL? elmt (car lst)) (remove elmt (cdr lst)))
+		(else (cons (car lst) (remove elmt (cdr lst))))
+	)
+)
+
+(define (getNextGeneration parents currentGen)
 	(COND
 		((NULL? currentGen) '())
-		(else (append (getKids parents (car currentGen)) (getNextGeneration (cdr currentGen))))
+		(else (append (getKids parents (car currentGen)) (getNextGeneration parents (cdr currentGen))))
 	)
 )
 
 (display (getKids parents 'male6))
 (newline)
 (display (getKids parents 'female6))
-(newline)
-(display (getNextGeneration (getParents parents 'male2)))
 (newline)
 (display (getParents parents 'female2))
 (newline)
