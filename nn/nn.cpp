@@ -55,9 +55,8 @@ std::vector<std::vector<double>> parsePrototypes(char* fileName)
 	// Loop through each line in the file, split it by ',' and add it to 
 	// the vector of prototypes
 	std::string line = "";
-	while(!prototypeFile.eof())
+	while(getline(prototypeFile, line))
 	{
-		getline(prototypeFile, line);
 		prototypes.push_back(convertStrToDoubleVector(line));
 	}
 	prototypeFile.close();
@@ -110,9 +109,8 @@ void findNearestNeighbor(std::vector<std::vector<double>> prototypes, char* file
 	std::vector<double> unknown;
 	double category;
 	
-	while(!unknownFile.eof())
+	while(getline(unknownFile, line))
 	{
-		getline(unknownFile, line);
 		unknown = convertStrToDoubleVector(line);
 		category = categorize(prototypes, unknown);
 		std::cout << category << std::endl;
@@ -130,7 +128,6 @@ int main(int argc, char* argv[])
 	char* prototype_file = argv[1];
 	char* unknown_file = argv[2];
 	
-	std::cout << prototype_file << ", " << unknown_file << std::endl;
 	std::vector<std::vector<double>> prototypes = parsePrototypes(prototype_file);
 	findNearestNeighbor(prototypes, unknown_file);
 	return 0;
