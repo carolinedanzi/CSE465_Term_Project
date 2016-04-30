@@ -1,3 +1,11 @@
+/**
+* Caroline Danzi
+* Dr. Zmuda
+* CSE 465
+* Person class stores a person, their parents, and their spouse if 
+* they have one
+*/
+
 import java.util.HashSet;
 
 public class Person {

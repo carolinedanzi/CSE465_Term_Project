@@ -43,7 +43,7 @@ mother(female6, female7).
 mother(female6, male7).
 mother(female8, female9).
 
-
+% Helper rules for determining great uncle or aunt
 parent(X, Y) :- father(X, Y).
 parent(X, Y) :- mother(X, Y).
 

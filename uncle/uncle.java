@@ -83,16 +83,17 @@ public class uncle {
 	
 	public static void main(String[] args) {
 		initializePeople();
-		System.out.println("True : " + isGreatUncleAunt("male6", "female7"));
-		System.out.println("False : " + isGreatUncleAunt("male6", "male8"));
-		System.out.println("False : " + isGreatUncleAunt("female7", "male3"));
-		System.out.println("True : " + isGreatUncleAunt("female4", "male7"));
-		System.out.println("True : " + isGreatUncleAunt("male3", "male7"));
+		System.out.println(isGreatUncleAunt("male6", "female7"));
+		System.out.println(isGreatUncleAunt("male6", "male8"));
+		System.out.println(isGreatUncleAunt("female7", "male3"));
+		System.out.println(isGreatUncleAunt("female4", "male7"));
+		System.out.println(isGreatUncleAunt("female4", "male3"));
+		System.out.println(isGreatUncleAunt("male3", "male7"));
 		
-		System.out.println("True : " + isGreatUncleAunt("male6", "female7"));
-		System.out.println("False : " + isGreatUncleAunt("female7", "male6"));
-		System.out.println("False : " + isGreatUncleAunt("male5", "female8"));
-		System.out.println("False : " + isGreatUncleAunt("male5", "male8"));
-		System.out.println("False : " + isGreatUncleAunt("male8", "female8"));
+		System.out.println(isGreatUncleAunt("male6", "female7"));
+		System.out.println(isGreatUncleAunt("female7", "male6"));
+		System.out.println(isGreatUncleAunt("male5", "female8"));
+		System.out.println(isGreatUncleAunt("male5", "male8"));
+		System.out.println(isGreatUncleAunt("male8", "female8"));
 	}
 }
